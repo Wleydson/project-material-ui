@@ -44,8 +44,13 @@ const TarefasToolbar = props => {
 
   const submit = (event) =>{
     event.preventDefault();
-    console.log( descricao)
-    console.log(categoria)
+    const tarefa ={
+      descricao: descricao,
+      categoria: categoria
+    }
+    props.salvar(tarefa)
+    setDescricao('')
+    setCategoria('')
   }
 
   return (
