@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -11,12 +11,13 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Typography,
   IconButton
 } from '@material-ui/core';
 
 import TimerIcon from '@material-ui/icons/Timer';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
+import DeleteIcon from '@material-ui/icons/Delete';
+
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -86,7 +87,11 @@ const TarefasTable = props => {
                             }
                             </IconButton>
                           </TableCell>
-                          <TableCell></TableCell>
+                          <TableCell>
+                            <IconButton onClick={ e => props.deletar(tarefa.id) }>
+                                <DeleteIcon/>
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
                       )
                     })

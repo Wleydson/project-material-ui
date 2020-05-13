@@ -62,11 +62,25 @@ const TarefaList = () => {
       })
   }
 
+  const deletar = (id) =>{
+    axios.delete(`${URL_API}/${id}`, {
+      headers: headers
+    }).then(response => {
+      const list = tarefas.filter( tarefa => tarefa.id !== id)
+      setTarefas(list)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+
   return (
     <div className={classes.root}>
       <TarefasToolbar salvar={salvar} />
       <div className={classes.content}>
-        <TarefasTable tarefas={tarefas} alterarStatus={alterarStatus}/>
+        <TarefasTable tarefas={tarefas} 
+                      alterarStatus={alterarStatus} 
+                      deletar={deletar}
+        />
       </div>
     </div>
   );
