@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios'
 
+import 
+{
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button
+}
+from '@material-ui/core'
+
 import { TarefasToolbar, TarefasTable } from './components';
 
 const useStyles = makeStyles(theme => ({
@@ -19,6 +29,8 @@ const TarefaList = () => {
   const classes = useStyles();
 
   const [tarefas, setTarefas] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [mensagem, setMensagem] = useState('');
 
   useEffect(() => {
     search()
@@ -30,9 +42,15 @@ const TarefaList = () => {
       }).then(response =>{
         const novaTarefa = response.data  
         setTarefas( [ ...tarefas, novaTarefa ] )
+        abrirDialogMensagem('Item salvo com sucesso !')
       }).catch(error =>{
-        console.log(error)
+        abrirDialogMensagem('Ocorreu um erro ao salvar')
       })
+  }
+
+  const abrirDialogMensagem = (mensagem) =>{
+      setMensagem(mensagem)
+      setOpenDialog(true)
   }
 
   const search = () =>{
@@ -42,7 +60,7 @@ const TarefaList = () => {
       const list = response.data
       setTarefas(list)
     }).catch(error =>{
-      console.log(error)
+      abrirDialogMensagem("Erro ao realizar a pesquisa")
     })
   }
 
@@ -57,8 +75,9 @@ const TarefaList = () => {
           }
         })
         setTarefas(list)
+        abrirDialogMensagem("Item atualizado com sucesso !")
       }).catch(error => {
-        console.log(error)
+        abrirDialogMensagem("Erro ao alterar o status")
       })
   }
 
@@ -68,8 +87,9 @@ const TarefaList = () => {
     }).then(response => {
       const list = tarefas.filter( tarefa => tarefa.id !== id)
       setTarefas(list)
+      abrirDialogMensagem("Item removido com sucesso !")
     }).catch(error => {
-      console.log(error)
+      abrirDialogMensagem("Erro ao deletar")
     })
   }
 
@@ -82,6 +102,14 @@ const TarefaList = () => {
                       deletar={deletar}
         />
       </div>
+
+      <Dialog open={openDialog} onClose={e => setOpenDialog(false)}>
+          <DialogTitle>Atenção</DialogTitle>
+          <DialogContent>{mensagem}</DialogContent>
+          <DialogActions>
+            <Button onClick={e => setOpenDialog(false)}>Fechar</Button>
+          </DialogActions>
+      </Dialog>
     </div>
   );
 };
