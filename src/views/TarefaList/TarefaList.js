@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
-import axios from 'axios'
-
 import 
 {
   Dialog,
@@ -11,8 +9,16 @@ import
   Button
 }
 from '@material-ui/core'
-
 import { TarefasToolbar, TarefasTable } from './components';
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { 
+  listar,
+  salvar,
+  deletar,
+  alterarStatus
+ } from '../../store/tarefasReducer'
+ import { esconderMensagem } from '../../store/mensagensReducer'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,96 +29,47 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const URL_API = 'https://minhastarefas-api.herokuapp.com/tarefas'
-const EMAIL= 'email_user_signIn';
-
-const TarefaList = () => {
+const TarefaList = (props) => {
   const classes = useStyles();
 
-  const [tarefas, setTarefas] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [mensagem, setMensagem] = useState('');
-
   useEffect(() => {
-    search()
-  }, [])
-
-  const salvar = (tarefa) =>{
-      axios.post(URL_API, tarefa, {
-        headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
-      }).then(response =>{
-        const novaTarefa = response.data  
-        setTarefas( [ ...tarefas, novaTarefa ] )
-        abrirDialogMensagem('Item salvo com sucesso !')
-      }).catch(error =>{
-        abrirDialogMensagem('Ocorreu um erro ao salvar')
-      })
-  }
-
-  const abrirDialogMensagem = (mensagem) =>{
-      setMensagem(mensagem)
-      setOpenDialog(true)
-  }
-
-  const search = () =>{
-    axios.get(URL_API, {
-      headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
-    }).then( response =>{
-      const list = response.data
-      setTarefas(list)
-    }).catch(error =>{
-      abrirDialogMensagem("Erro ao realizar a pesquisa")
-    })
-  }
-
-  const alterarStatus = (id) =>{
-      axios.patch(`${URL_API}/${id}`, null, {
-        headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
-      }).then(response => {
-        const list = [...tarefas]
-        list.forEach(tarefa =>{
-          if(tarefa.id === id){
-            tarefa.done = true
-          }
-        })
-        setTarefas(list)
-        abrirDialogMensagem("Item atualizado com sucesso !")
-      }).catch(error => {
-        abrirDialogMensagem("Erro ao alterar o status")
-      })
-  }
-
-  const deletar = (id) =>{
-    axios.delete(`${URL_API}/${id}`, {
-      headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
-    }).then(response => {
-      const list = tarefas.filter( tarefa => tarefa.id !== id)
-      setTarefas(list)
-      abrirDialogMensagem("Item removido com sucesso !")
-    }).catch(error => {
-      abrirDialogMensagem("Erro ao deletar")
-    })
-  }
+    props.listar()
+  })
 
   return (
     <div className={classes.root}>
-      <TarefasToolbar salvar={salvar} />
+      <TarefasToolbar salvar={props.salvar} />
       <div className={classes.content}>
-        <TarefasTable tarefas={tarefas} 
-                      alterarStatus={alterarStatus} 
-                      deletar={deletar}
+        <TarefasTable tarefas={props.tarefas} 
+                      alterarStatus={props.alterarStatus} 
+                      deletar={props.deletar}
         />
       </div>
 
-      <Dialog open={openDialog} onClose={e => setOpenDialog(false)}>
+      <Dialog open={props.openDialog} onClose={props.esconderMensagem}>
           <DialogTitle>Atenção</DialogTitle>
-          <DialogContent>{mensagem}</DialogContent>
+          <DialogContent>{props.mensagem}</DialogContent>
           <DialogActions>
-            <Button onClick={e => setOpenDialog(false)}>Fechar</Button>
+            <Button onClick={props.esconderMensagem}>Fechar</Button>
           </DialogActions>
       </Dialog>
     </div>
   );
 };
 
-export default TarefaList;
+const mapStateToProps = state => ({
+  tarefas: state.tarefas.tarefas,
+  mensagem: state.mensagens.mensagem,
+  openDialog: state.mensagens.openDialog
+})
+
+const mapDispatchToProps = dispatch => 
+  bindActionCreators({ 
+    listar, 
+    salvar, 
+    deletar, 
+    alterarStatus, 
+    esconderMensagem 
+  }, dispatch)
+
+export default connect(mapStateToProps, mapDispatchToProps) (TarefaList);
