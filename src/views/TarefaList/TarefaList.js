@@ -24,7 +24,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const URL_API = 'https://minhastarefas-api.herokuapp.com/tarefas'
-const headers = { 'x-tenant-id' : 'wleydson@email.com' }
+const EMAIL= 'email_user_signIn';
+
 const TarefaList = () => {
   const classes = useStyles();
 
@@ -38,7 +39,7 @@ const TarefaList = () => {
 
   const salvar = (tarefa) =>{
       axios.post(URL_API, tarefa, {
-        headers: headers
+        headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
       }).then(response =>{
         const novaTarefa = response.data  
         setTarefas( [ ...tarefas, novaTarefa ] )
@@ -55,7 +56,7 @@ const TarefaList = () => {
 
   const search = () =>{
     axios.get(URL_API, {
-      headers: headers
+      headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
     }).then( response =>{
       const list = response.data
       setTarefas(list)
@@ -66,7 +67,7 @@ const TarefaList = () => {
 
   const alterarStatus = (id) =>{
       axios.patch(`${URL_API}/${id}`, null, {
-        headers: headers
+        headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
       }).then(response => {
         const list = [...tarefas]
         list.forEach(tarefa =>{
@@ -83,7 +84,7 @@ const TarefaList = () => {
 
   const deletar = (id) =>{
     axios.delete(`${URL_API}/${id}`, {
-      headers: headers
+      headers:  { 'x-tenant-id' : localStorage.getItem(EMAIL) }
     }).then(response => {
       const list = tarefas.filter( tarefa => tarefa.id !== id)
       setTarefas(list)

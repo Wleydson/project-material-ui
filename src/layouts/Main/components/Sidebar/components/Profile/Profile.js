@@ -26,10 +26,14 @@ const Profile = props => {
 
   const classes = useStyles();
 
+  const EMAIL= 'email_user_signIn';
+  const EMAIL_DEV_MASTER  = 'wleydson@email.com';
+  const master = localStorage.getItem(EMAIL) === EMAIL_DEV_MASTER;
+
   const user = {
-    name: 'Wleydson',
-    avatar: '/images/avatars/perfil.jpeg',
-    bio: 'Developer'
+    name: master ? 'Wleydson' : localStorage.getItem('email_user_signIn'),
+    avatar: master ? '/images/avatars/perfil.jpeg' : '/images/avatars/avatar_11.png',
+    bio: master ? 'Developer Master' : 'User'
   };
 
   return (
